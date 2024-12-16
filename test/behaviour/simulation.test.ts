@@ -2,7 +2,7 @@ import { Position } from "@src/concepts/position"
 import { getRobotState, Robot } from "@src/concepts/robot"
 import { ArrayReader } from "@src/util/io/array-reader"
 import { Vector } from "@src/util/vector"
-import { CommandStreamReader } from "@src/behaviour/command-stream-reader"
+import { CommandStreamReader } from "@src/behaviour/command-reader"
 import { RobotSimulator } from "@src/behaviour/robot-simulator"
 import { runSimulation } from "@src/behaviour/simulation"
 import { TableSurface } from "@src/behaviour/table-surface"
@@ -13,12 +13,12 @@ async function recordSimulation(
     input: string[]): Promise<string[]> {
 
     var output: string[] = [];
-    const collector = (robot: Robot) => {
-        output.push(getRobotState(robot));
+    const collector = (text: string) => {
+        output.push(text.replace('Output: ', ''));
     }
     
     const surface = new TableSurface(origin, extents);
-    const simulator = new RobotSimulator(surface, collector);
+    const simulator = new RobotSimulator(surface, undefined, collector);
     const stream = new CommandStreamReader(new ArrayReader(input));
 
     await runSimulation(simulator, stream);

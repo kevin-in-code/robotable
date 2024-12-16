@@ -7,7 +7,8 @@ interface Simulator {
     advanceRobot(distance: number): void;
     turnRobot(degrees: number): void;
 
-    report(): void;
+    reportRobotStatus(): void;
+    reportRouteTo(goal: Position): void;
 }
 
 export {

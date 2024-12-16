@@ -1,24 +1,28 @@
-import { getOrientationDirection, Orientation, rotateOrientation } from '../concepts/orientation';
-import { createRobot, Robot } from '../concepts/robot';
+import { PathFinder } from '@src/concepts/path-finder';
+import { move, Position } from '../concepts/position';
+import { Orientation, rotateOrientation } from '../concepts/orientation';
+import { createRobot, getRobotState, Robot } from '../concepts/robot';
 import { PlaySurface } from '../contracts/play-surface';
 import { Simulator } from '../contracts/simulator'
-import { addVectors, Vector } from '../util/vector';
+import { Vector } from '../util/vector';
 
 
 class RobotSimulator implements Simulator {
     private surface: PlaySurface;
-    private reportReceiver?: (robot: Robot) => void;
+    private pathFinder?: PathFinder;
+    private publish?: (text: string) => void;
     private robot?: Robot;
 
-    constructor(surface: PlaySurface, reportReceiver?: (robot: Robot) => void) {
+    constructor(surface: PlaySurface, pathFinder?: PathFinder, publish?: (text: string) => void) {
         this.surface = surface;
-        this.reportReceiver = reportReceiver;
+        this.pathFinder = pathFinder;
+        this.publish = publish;
     }
 
     placeRobot(position: Vector, orientation: Orientation): void {
         const robot = createRobot(position, orientation);
 
-        if (this.surface.contains(robot.centre)) {
+        if (this.surface.isAvailablePosition(robot.centre)) {
             this.robot = robot;
         }
     }
@@ -26,12 +30,9 @@ class RobotSimulator implements Simulator {
     advanceRobot(distance: number): void {
         if (!this.robot) return;
         
-        const [dx, dy] = getOrientationDirection(this.robot.orientation);
-        const position = addVectors(
-            this.robot.centre,
-            [ dx * distance, dy * distance ]);
+        const position = move(this.robot.centre, this.robot.orientation, distance);
         
-        if (this.surface.contains(position)) {
+        if (this.surface.isAvailablePosition(position)) {
             this.robot.centre = position;
         }
     }
@@ -44,9 +45,23 @@ class RobotSimulator implements Simulator {
             degrees);
     }
 
-    report(): void {
-        if (this.reportReceiver && this.robot) {
-            this.reportReceiver(this.robot);
+    reportRobotStatus(): void {
+        if (!this.publish || !this.robot) return;
+
+        const state = getRobotState(this.robot);
+        this.publish(`Output: ${state}`);
+    }
+
+    reportRouteTo(goal: Position): void {
+        if (!this.publish || !this.robot || !this.pathFinder) return;
+
+        const script = this.pathFinder(this.surface, this.robot, goal);
+        if (!script) {
+            this.publish('NO ROUTE')
+        } else {
+            for (const action of script) {
+                this.publish(`Step: ${action}`);
+            }
         }
     }
 }

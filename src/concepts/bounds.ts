@@ -21,7 +21,7 @@ function boundsContains(bounds: Bounds, position: Position) {
     const maxX = Math.max(bounds.origin[0], bounds.origin[0] + bounds.extents[0]);
     const maxY = Math.max(bounds.origin[1], bounds.origin[1] + bounds.extents[1]);
 
-    return (minX <= x) && (x <= maxX) && (minY <= y) && (y <= maxY);
+    return (minX <= x) && (x < maxX) && (minY <= y) && (y < maxY);
 }
 
 export {

@@ -7,6 +7,7 @@
 class LineBuffer {
     private lastLineReceived: boolean = false;
     private lines: string[] = [];
+    private allLines: string[] = [];
     private newLineDelivered?: Promise<void>;
     private resolve?: () => void;
 
@@ -27,12 +28,14 @@ class LineBuffer {
     add(line: string) {
         if (!this.lastLineReceived) {
             this.lines.push(line);
+            this.allLines.push(line);
             this.releaseReader();
         }
     }
 
     end() {
         this.lastLineReceived = true;
+        this.releaseReader();
     }
 
     async readLine(): Promise<string | undefined> {

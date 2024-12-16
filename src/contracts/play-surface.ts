@@ -1,7 +1,9 @@
 import { Position } from "../concepts/position";
 
 interface PlaySurface {
-    contains: (position: Position) => boolean;
+    isValidPosition: (position: Position) => boolean;
+
+    isAvailablePosition: (position: Position) => boolean;
 }
 
 export {

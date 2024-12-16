@@ -4,7 +4,7 @@ import { Scanner } from "../../util/scanner";
 
 class ReportCommand implements Command {
     performOn(simulator: Simulator): void {
-        simulator.report();
+        simulator.reportRobotStatus();
     }
 }
 

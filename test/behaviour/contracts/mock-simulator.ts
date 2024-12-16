@@ -28,8 +28,12 @@ class MockSimulator implements Simulator {
         this.totalDegrees += Math.abs(degrees);
     }
 
-    report() {
+    reportRobotStatus() {
         this.reports++;
+    }
+
+    reportRouteTo(goal: Position): void {
+        throw new Error("Method not implemented.");
     }
 }
 

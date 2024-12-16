@@ -9,8 +9,9 @@ import { parseRightTurnCommandBody } from "./commands/right-turn-command";
 import { parseMoveCommandBody } from "./commands/move-command";
 import { parsePlaceCommandBody } from "./commands/place-command";
 import { NullCommand } from "./commands/null-command";
+import { parseFindCommandBody } from "./commands/find-command";
 
-class CommandStreamReader implements CommandSource {
+class CommandReader implements CommandSource {
     private scanner: Scanner;
 
     constructor(reader: Reader, isTTY?: boolean) {
@@ -51,7 +52,11 @@ class CommandStreamReader implements CommandSource {
                 case 'REPORT':
                     command = await parseReportCommandBody(this.scanner);
                     break;
-    
+
+                case 'FIND':
+                    command = await parseFindCommandBody(this.scanner);
+                    break;
+        
                 default:
                     throw new Error('Invalid command');
             }
@@ -66,5 +71,5 @@ class CommandStreamReader implements CommandSource {
 }
 
 export {
-    CommandStreamReader,
+    CommandReader as CommandStreamReader,
 }
